@@ -162,18 +162,30 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     }
 
     let pHash = 'not_applicable';
+    const watermarkText = req.body.watermarkText || `Content Verification - ${new Date().toISOString()}`;
+    const watermarkType = (req.body.watermarkType || 'visible').toLowerCase();
 
-    if (imageFile) {
-      // 2. Apply watermark in-place only for images
-      const watermarkText = `Content Verification - ${new Date().toISOString()}`;
-      await execa('python', ['src/watermark.py', filePath, watermarkText]); 
-      console.log(`Watermarking complete for ${originalFilename}`);
-      
-      // 3. Compute pHash on the final, watermarked image
+    if (fileCategory === 'image') {
+      // 2. Apply image watermark (visible or invisible LSB)
+      if (watermarkType === 'invisible-lsb') {
+        await execa('python', ['src/watermark.py', 'image', filePath, watermarkText, 'invisible-lsb']);
+      } else {
+        await execa('python', ['src/watermark.py', 'image', filePath, watermarkText, 'visible']);
+      }
+      console.log(`Watermarking complete for ${originalFilename} (${watermarkType})`);
+
+      // 3. Compute pHash on the final, watermarked image.
       pHash = await calculatePHash(filePath);
       console.log(`Hashes complete: SHA-256 (original): ${sha256Hash}, pHash (watermarked): ${pHash}`);
+
+    } else if (fileCategory === 'video') {
+      // 2. Apply video watermark (visible only for now)
+      await execa('python', ['src/watermark.py', 'video', filePath, watermarkText, 'visible']);
+      console.log(`Video watermarking complete for ${originalFilename} (${watermarkType})`);
+      pHash = 'not_applicable';
+
     } else {
-      console.log(`Non-image file detected (${originalFilename}). Skipping watermark/pHash.`);
+      console.log(`Non-media file detected (${originalFilename}). Skipping watermark/pHash.`);
     }
 
     console.log('Pinning to IPFS...');
@@ -191,12 +203,15 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     console.log(`✅ Record created! Transaction hash: ${receipt.hash}`);
 
     res.json({
-      message: imageFile
-        ? 'Image watermarked, processed, pinned to IPFS, and registered on-chain.'
+      message: fileCategory === 'image'
+        ? `Image ${watermarkType === 'invisible-lsb' ? 'invisibly' : 'visibly'} watermarked, processed, pinned to IPFS, and registered on-chain.`
+        : fileCategory === 'video'
+        ? 'Video watermarked, processed, pinned to IPFS, and registered on-chain.'
         : 'File processed, pinned to IPFS, and registered on-chain.',
       filename: originalFilename,
-      isImage: imageFile,
+      isImage: fileCategory === 'image',
       fileCategory: fileCategory,
+      watermarkType: watermarkType,
       mimetype: req.file.mimetype || 'application/octet-stream',
       sha256: sha256Hash,
       pHash: pHash,

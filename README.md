@@ -101,11 +101,11 @@ This project is in active development. Here is the planned roadmap:
 
 [x] Phase 5: Deploy blockchain contract and connect API (local).
 
-[ ] Phase 6: Extend to video, optimize watermark robustness (Post-MVP).
+[x] Phase 6: Extend to video, optimize watermark robustness (Post-MVP).
 
-[ ] Post-MVP: Implement invisible watermarking (DCT/LSB).
+[x] Post-MVP: Implement invisible watermarking (DCT/LSB).
 
-[ ] Post-MVP: Deploy to a public testnet (Amoy).
+[x] Post-MVP: Deploy to a public testnet (Amoy).
 
 ### 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
