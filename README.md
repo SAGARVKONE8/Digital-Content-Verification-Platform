@@ -41,6 +41,9 @@ In your first terminal, start the Hardhat local node:
 # Navigate to the blockchain project
 cd backend/blockchain
 
+# install dependencies
+npm install
+
 # Run the local node
 npx hardhat node
 ```
@@ -70,6 +73,9 @@ In the same second terminal (or a new one), start the main API server:
 # Navigate to the main backend
 cd backend
 
+# install dependencies
+npm install
+
 # Run the server
 npm run dev
 ```
@@ -81,6 +87,9 @@ This will start your API server on http://localhost:3001 and connect to your loc
 ```bash
 # Navigate to the frontend
 cd frontend
+
+# install dependencies
+npm install
 
 # Run the app
 npm run dev
