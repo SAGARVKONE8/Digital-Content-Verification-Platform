@@ -116,5 +116,5 @@ This project is in active development. Here is the planned roadmap:
 
 [x] Post-MVP: Deploy to a public testnet (Amoy).
 
-### 📄 License
+### 📄License
 This project is licensed under the MIT License - see the LICENSE file for details.
